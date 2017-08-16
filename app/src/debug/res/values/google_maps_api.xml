@@ -1,0 +1,26 @@
+<resources>
+    <!--
+    TODO: Before you run your application, you need a Google Maps API key.
+
+    To get one, follow this link, follow the directions and press "Create" at the end:
+
+    https://console.developers.google.com/flows/enableapi?apiid=maps_android_backend&keyType=CLIENT_SIDE_ANDROID&r=AF:B0:4D:F4:22:59:8F:E1:55:65:4C:73:AC:19:93:D8:1F:87:DB:14%3Bmircod.com.foursquareclient.components.ui.activities
+
+    You can also add your credentials to an existing key, using these values:
+
+    Package name:
+    AF:B0:4D:F4:22:59:8F:E1:55:65:4C:73:AC:19:93:D8:1F:87:DB:14
+
+    SHA-1 certificate fingerprint:
+    AF:B0:4D:F4:22:59:8F:E1:55:65:4C:73:AC:19:93:D8:1F:87:DB:14
+
+    Alternatively, follow the directions here:
+    https://developers.google.com/maps/documentation/android/start#get-key
+
+    Once you have your key (it starts with "AIza"), replace the "google_maps_key"
+    string in this file.
+    -->
+    <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">
+        YOUR_KEY_HERE
+    </string>
+</resources>
