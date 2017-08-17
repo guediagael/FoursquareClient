@@ -13,8 +13,8 @@ public class RetrofitClient {
     private static final String BASE_URL = "https://api.foursquare.com/v2/venues/";
     private static final Retrofit ourInstance = new Retrofit.Builder()
             .baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create(new GsonBuilder()
-                    .excludeFieldsWithoutExposeAnnotation().create()))
+//            .addConverterFactory(GsonConverterFactory.create(new GsonBuilder()
+//                    .excludeFieldsWithoutExposeAnnotation().create()))
             .build();
 
 
