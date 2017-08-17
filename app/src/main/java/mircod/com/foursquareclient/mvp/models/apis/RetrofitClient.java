@@ -4,6 +4,7 @@ import com.google.gson.GsonBuilder;
 
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 /**
  * Created by guedi on 8/16/2017.
@@ -15,6 +16,7 @@ public class RetrofitClient {
             .baseUrl(BASE_URL)
 //            .addConverterFactory(GsonConverterFactory.create(new GsonBuilder()
 //                    .excludeFieldsWithoutExposeAnnotation().create()))
+//            .addConverterFactory(ScalarsConverterFactory.create())
             .build();
 
 

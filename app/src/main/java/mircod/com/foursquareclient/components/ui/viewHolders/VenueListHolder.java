@@ -41,7 +41,7 @@ public class VenueListHolder extends RecyclerView.ViewHolder {
     }
 
 
-    public void bindData(String name,String distance, final String id){
+    public void bindData(String name,String distance, final long id){
         tvName.setText(name);
         tvDistance.setText(distance);
 
@@ -55,12 +55,13 @@ public class VenueListHolder extends RecyclerView.ViewHolder {
 
     public ImageView getIvThumbnail(){
         pbThumbnail.setVisibility(View.GONE);
+        ivThumbnail.setVisibility(View.VISIBLE);
         return ivThumbnail;
     }
 
     public interface ClearButtonListener{
 
-        void clearButtonPressed(String id);
+        void clearButtonPressed(long id);
     }
 
 

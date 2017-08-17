@@ -3,10 +3,13 @@ package mircod.com.foursquareclient.mvp.models.repositories;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -43,6 +46,8 @@ public class MainRepository {
     private VenueDao venueDao;
     private PhotoDao photoDao;
 
+    private RepositoryListener mListener;
+
 
     public MainRepository(DaoSession daoSession) {
         mApi = RetrofitClient.getInstance().create(FoursquareApi.class);
@@ -50,95 +55,121 @@ public class MainRepository {
         venueDao = mDaoSession.getVenueDao();
         photoDao = mDaoSession.getPhotoDao();
         venues = new CopyOnWriteArrayList<>();
+        numberOfVenueToLoad = new AtomicInteger(0);
 
     }
 
 
-    public List<Venue> getNearbyVenues(String latLong){
-        Call<JSONObject> call = mApi.getVenuesList(latLong, INTENT, CLIENT_ID, CLIENT_SECRET,VERSION,M);
-        call.enqueue(new Callback<JSONObject>() {
-            @Override
-            public void onResponse(Call<JSONObject> call, Response<JSONObject> response) {
-                JSONObject respBody = response.body();
-                try {
-                    JSONObject meta = respBody.getJSONObject("meta");
-                    if (meta.get("code")==200){
-                        JSONObject data = respBody.getJSONObject("response");
-                        JSONArray venues = data.getJSONArray("venues");
-                        numberOfVenueToLoad = new AtomicInteger(venues.length());
-                        for (int i=0;i<venues.length();i++){
-                            JSONObject venue = venues.getJSONObject(i);
-                            String name = venue.getString("name");
-                            JSONObject location = venue.getJSONObject("location");
-                            String address = " ";
-                            int distance = 0;
-                            if (location!=null) {
-                                address = location.getString("address");
-                                distance = location.getInt("distance");
-                            }
-                            JSONArray categories = venue.getJSONArray("categories");
-                            String cats = "";
-                            for (int j = 0 ; j <categories.length();j++){
-                                String catName = categories.getJSONObject(j).getString("name");
-                                cats = cats.concat("," + " "+ catName);
-                            }
-
-                            final String venueId = venue.getString("id");
-
-                            Venue v = new Venue();
-                            v.setVenueId(venueId);
-                            v.setName(name);
-                            v.setAddress(address);
-                            v.setDistance(distance);
-
-                            addVenueToList(v);
 
 
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    getVenueDetails(venueId);
-                                }
-                            }).start();
-                        }
+    public void getNearbyVenues(@Nullable String latLong){
+        if (latLong!=null){
+            Call<ResponseBody> call = mApi.getVenuesList(latLong, INTENT, CLIENT_ID, CLIENT_SECRET,VERSION,M);
+            call.enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                 try {
+                     String body = response.body().string();
+
+                     JSONObject object = new JSONObject(body);
+                     Log.d(MainRepository.class.getSimpleName(), "response ob:" + object+","+ object.length());
+                     JSONObject meta = object.getJSONObject("meta");
+                     if ((int)meta.get("code")==200){
+                         JSONObject data = object.getJSONObject("response");
+                         JSONArray venues = data.getJSONArray("venues");
+                         Log.d(MainRepository.class.getSimpleName(), "venues count: "+
+                                 venues.length());
+                         numberOfVenueToLoad = new AtomicInteger(venues.length());
+                         for (int i=0;i<venues.length();i++){
+                             JSONObject venue = venues.getJSONObject(i);
+                             String name = venue.getString("name");
+                             String address = " ";
+                             int distance = 0;
+                             if (venue.has("location")) {
+                                 JSONObject location = venue.getJSONObject("location");
+                                 if (location.has("address") && location.has("address")){
+                                     address = location.getString("address");
+                                     distance = location.getInt("distance");
+                                 }
+                             }
+                             JSONArray categories = venue.getJSONArray("categories");
+                             StringBuilder builder = new StringBuilder();
+                             for (int j = 0 ; j <categories.length();j++){
+                                 String catName = categories.getJSONObject(j).getString("name") + " ";
+                                 builder.append(catName);
+                             }
+                             String cats = builder.toString();
 
 
-                    }else {
-//                        TODO: ahow error message
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    Log.d(MainRepository.class.getSimpleName(), e.getMessage());
-                } catch (NullPointerException e) {
-                    Log.d(MainRepository.class.getSimpleName(), e.getMessage());
+                             final String venueId = venue.getString("id");
+
+                             Venue v = new Venue();
+                             v.setVenueId(venueId);
+                             v.setName(name);
+                             v.setAddress(address);
+                             v.setDistance(distance);
+                             v.setCategories(cats);
+
+                             addVenueToList(v);
+
+
+                             new Thread(new Runnable() {
+                                 @Override
+                                 public void run() {
+                                     getVenueDetails(venueId);
+                                 }
+                             }).start();
+
+
+                         }
+
+
+                     }else {
+//                        TODO: show error message
+                         Log.d(MainRepository.class.getSimpleName(),"response error: " +
+                                 response.toString());
+                     }
+                 } catch (IOException e) {
+                     e.printStackTrace();
+                     Log.d(MainRepository.class.getSimpleName(), "response:" + e.getMessage());
+                 } catch (JSONException e) {
+                     e.printStackTrace();
+                     Log.d(MainRepository.class.getSimpleName(), "response eror:" + e.getMessage());
+                 }
                 }
 
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                    Log.d(MainRepository.class.getSimpleName(), "response:" + t.getMessage());
 
-            }
+                }
+            });
 
-            @Override
-            public void onFailure(Call<JSONObject> call, Throwable t) {
-
-            }
-        });
-//        TODO: get the data  and get id for each data and fetch details;
+        }else {
+            //        TODO: get the data  and get id for each data and fetch details;
+        }
 
 
-        while (isRequestQueued());
-        return venues;
+
+
+
+
+
 
     }
 
     private void getVenueDetails(final String id){
-        Call<JSONObject> call = mApi.getVenueDetails(id,INTENT,CLIENT_ID,CLIENT_SECRET,VERSION,M);
-        call.enqueue(new Callback<JSONObject>() {
+        Call<ResponseBody> call = mApi.getVenueDetails(id,INTENT,CLIENT_ID,CLIENT_SECRET,VERSION,M);
+        call.enqueue(new Callback<ResponseBody>() {
             @Override
-            public void onResponse(Call<JSONObject> call, Response<JSONObject> response) {
-                JSONObject respBody = response.body();
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 try {
+                    String body = response.body().string();
+                    JSONObject respBody = new JSONObject(body);
                     JSONObject meta = respBody.getJSONObject("meta");
-                    if (meta.get("code")==200){
-                        JSONObject venue = respBody.getJSONObject("response");
+                    if ((int)meta.get("code")==200){
+                        JSONObject venueResponse = respBody.getJSONObject("response");
+                        JSONObject venue = venueResponse.getJSONObject("venue");
                         String bestPhotoUrl = null;
                         if (venue.has("bestPhoto")){
                             JSONObject bestPhoto = venue.getJSONObject("bestPhoto");
@@ -149,14 +180,22 @@ public class MainRepository {
                             }
                         }
 
-                        JSONObject likes = venue.getJSONObject("likes ");
-                        int likesCount = likes.getInt("count");
+
+                        int likesCount = 0;
+                        if (venue.has("likes")){
+                            JSONObject likes = venue.getJSONObject("likes");
+                            likesCount = likes.getInt("count");
+                        }
+
 
                         JSONObject photos = venue.getJSONObject("photos");
+
                         JSONArray groups = photos.getJSONArray("groups");
+                        Log.d("groupssssss", groups.toString());
                         List<String> urls = new ArrayList<>();
                         for (int i = 0; i<groups.length(); i++){
-                            JSONArray items = groups.getJSONArray(i);
+                            JSONArray items = groups.getJSONObject(i).getJSONArray("items");
+                            Log.d("itemmmm",items.toString());
                             for (int j = 0; j<items.length(); j++){
                                 String url;
                                 JSONObject item  = items.getJSONObject(j);
@@ -164,6 +203,7 @@ public class MainRepository {
                                 String suffix = item.getString("suffix");
                                 url = prefix + "600x600" + suffix;
                                 urls.add(url);
+                                Log.d("tof",url);
                                 if (j==10) break;
 
                             }
@@ -177,21 +217,28 @@ public class MainRepository {
                 }catch (NullPointerException e){
                     Log.d(MainRepository.class.getSimpleName(), e.getMessage());
 
+                } catch (IOException e) {
+                    Log.d(MainRepository.class.getSimpleName(), e.getMessage());
                 }
+
+
+                int rest = numberOfVenueToLoad.decrementAndGet();
+                Log.d("venue queues", String.valueOf(rest));
+                if (rest<1) mListener.dataLoaded(venues);
+
 
             }
 
             @Override
-            public void onFailure(Call<JSONObject> call, Throwable t) {
-
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Log.d(MainRepository.class.getSimpleName(), t.getMessage());
             }
         });
-        numberOfVenueToLoad.decrementAndGet();
+
+
+
     }
 
-    private boolean isRequestQueued(){
-        return (numberOfVenueToLoad.get()>0);
-    }
 
     private void addVenueToList(Venue venue){
         venues.add(venue);
@@ -199,21 +246,40 @@ public class MainRepository {
 
     private void updateVenueFromList(String id, int likes, List<String> photoUrls, @Nullable String bestPhoto){
         for (Venue venue : venues) {
-            if (venue.equals(id)) {
+            if (venue.getVenueId().equals(id)) {
                 venue.setLikes(likes);
                 if (bestPhoto != null) venue.setBestPhotoUri(bestPhoto);
-                else venue.setBestPhotoUri(photoUrls.get(0));
+                else {
+                    if (photoUrls.size()>0) {
+                        Log.d(getClass().getSimpleName(),"best tof :"+ photoUrls.get(0));
+                        venue.setBestPhotoUri(photoUrls.get(0));
+                    }
+                }
+              venueDao.insertOrReplace(venue);
             }
         }
         for (String url : photoUrls){
+            Log.d(getClass().getSimpleName(),"photos :"+ url);
             Photo photo = new Photo();
             photo.setVenueId(id);
             photo.setUri(url);
-            photoDao.insert(photo);
+            photoDao.insertOrReplace(photo);
 //            TODO: save to the sd card
         }
 
 
+
     }
 
+
+
+    public void setListener(RepositoryListener listener){
+        mListener = listener;
+    }
+
+
+    public interface RepositoryListener{
+        void dataLoaded(List<Venue> venues);
+        void error(int code);
+    }
 }

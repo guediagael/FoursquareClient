@@ -1,53 +1,55 @@
 package mircod.com.foursquareclient.components.ui.fragments;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import mircod.com.foursquareclient.R;
+import mircod.com.foursquareclient.components.App;
+import mircod.com.foursquareclient.components.ui.adapters.VenuesListAdapter;
+import mircod.com.foursquareclient.mvp.contracts.VenuesListContract;
+import mircod.com.foursquareclient.mvp.models.daos.DaoSession;
+import mircod.com.foursquareclient.mvp.models.daos.Venue;
+import mircod.com.foursquareclient.mvp.models.repositories.MainRepository;
+import mircod.com.foursquareclient.mvp.presenters.VenuesPresenter;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link VenuesListFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link VenuesListFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class VenuesListFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+public class VenuesListFragment extends Fragment implements BaseFragment,
+        VenuesListContract.VenuesListView, SwipeRefreshLayout.OnRefreshListener, VenuesListAdapter.VenueInteractionListener {
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private static final String ARG_LAT = "latitude";
+    private static final String ARG_LONG = "longitude";
 
+
+    private double mLat;
+    private double mLong;
+    private List<Venue> mVenues;
+
+    private VenuesListContract.VenuesListPresenter mPresenter;
     private OnFragmentInteractionListener mListener;
+    private RecyclerView rvVenues;
+    private SwipeRefreshLayout refreshLayout;
 
     public VenuesListFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment VenuesListFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static VenuesListFragment newInstance(String param1, String param2) {
+
+    public static VenuesListFragment newInstance(double lat, double lng) {
         VenuesListFragment fragment = new VenuesListFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putDouble(ARG_LAT, lat);
+        args.putDouble(ARG_LONG, lng);
         fragment.setArguments(args);
         return fragment;
     }
@@ -56,9 +58,13 @@ public class VenuesListFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            mLat = getArguments().getDouble(ARG_LAT);
+            mLong = getArguments().getDouble(ARG_LONG);
         }
+        DaoSession daoSession = ((App)getActivity().getApplication()).getDaoSession();
+        mPresenter = new VenuesPresenter(new MainRepository(daoSession),this);
+        mVenues = new ArrayList<>();
+
     }
 
     @Override
@@ -68,11 +74,14 @@ public class VenuesListFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_venues_list, container, false);
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        rvVenues = view.findViewById(R.id.recyclerMainList);
+        rvVenues.setLayoutManager(new LinearLayoutManager(getActivity()));
+        refreshLayout = (SwipeRefreshLayout)view;
+        refreshLayout.setOnRefreshListener(this);
+        mPresenter.getVenues(mLat+","+mLong);
     }
 
     @Override
@@ -92,18 +101,51 @@ public class VenuesListFragment extends Fragment {
         mListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
+    @Override
+    public void onError(int errorCode) {
+
+    }
+
+    @Override
+    public void venuesLoaded(final List<Venue> venues) {
+        mVenues.clear();
+        mVenues.addAll(venues);
+        new Handler().post(new Runnable() {
+            @Override
+            public void run() {
+                rvVenues.setAdapter(new VenuesListAdapter(mVenues,VenuesListFragment.this));
+            }
+        });
+
+    }
+
+    @Override
+    public void onRefresh() {
+//        TODO: check the connection, if there is load from the db else load from the net
+    }
+
+    private void loadVenues(){
+        if (isNetworkAvailable()) mPresenter.getVenues(mLat+","+mLong);
+        else mPresenter.getVenues(null);
+    }
+
+    private boolean isNetworkAvailable(){
+//        TODO:
+        return false;
+    }
+
+    @Override
+    public void venueSelected(String venueId) {
+        mListener.openDetailsActivity(venueId);
+    }
+
+    @Override
+    public void deleteVenue(long id) {
+
+    }
+
+
     public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+       void openDetailsActivity(String venueId);
     }
 }

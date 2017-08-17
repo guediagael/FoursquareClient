@@ -1,7 +1,10 @@
 package mircod.com.foursquareclient.mvp.models.apis;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
+
+import okhttp3.Response;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -15,16 +18,16 @@ import retrofit2.http.Query;
 public interface FoursquareApi {
 
     @GET("{id}")
-    Call<JSONObject> getVenueDetails (@Path("id")String id, @Query("intent") String intent,
-                                      @Query("client_id") String idKey,
-                                      @Query("client_secret") String secretKey,
-                                      @Query("v") String version,
-                                      @Query("m") String m);
+    Call<ResponseBody> getVenueDetails (@Path("id")String id, @Query("intent") String intent,
+                                     @Query("client_id") String idKey,
+                                     @Query("client_secret") String secretKey,
+                                     @Query("v") String version,
+                                     @Query("m") String m);
 
     @GET("search")
-    Call<JSONObject> getVenuesList (@Query("ll") String latLong,@Query("intent") String intent,
-                                      @Query("client_id") String idKey,
-                                      @Query("client_secret") String secretKey,
-                                      @Query("v") String version,
-                                      @Query("m") String m);
+    Call<ResponseBody> getVenuesList (@Query("ll") String latLong, @Query("intent") String intent,
+                                            @Query("client_id") String idKey,
+                                            @Query("client_secret") String secretKey,
+                                            @Query("v") String version,
+                                            @Query("m") String m);
 }
