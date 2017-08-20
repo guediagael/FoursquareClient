@@ -10,6 +10,7 @@ import org.greenrobot.greendao.annotation.ToMany;
 import java.util.List;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.DaoException;
+import org.greenrobot.greendao.annotation.Unique;
 
 /**
  * Created by guedi on 8/16/2017.
@@ -18,9 +19,9 @@ import org.greenrobot.greendao.DaoException;
 @Entity(indexes = {@Index(value = "venueId", unique= true)})
 public class Venue {
     @Id(autoincrement = true)
-    private long id;
+    private Long id;
 
-    @NotNull
+    @Unique
     private String venueId;
 
     @NotNull
@@ -32,8 +33,8 @@ public class Venue {
     private int likes;
     private String bestPhotoUri;
     
-    @Generated(hash = 1594187984)
-    public Venue(long id, @NotNull String venueId, @NotNull String name, String address,
+    @Generated(hash = 1898405317)
+    public Venue(Long id, String venueId, @NotNull String name, String address,
             String categories, int distance, int likes, String bestPhotoUri) {
         this.id = id;
         this.venueId = venueId;
@@ -92,13 +93,11 @@ public class Venue {
         this.categories = categories;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
-        this.id = id;
-    }
+
 
     public String getBestPhotoUri() {
         return bestPhotoUri;
@@ -114,5 +113,9 @@ public class Venue {
 
     public void setLikes(int likes) {
         this.likes = likes;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }
