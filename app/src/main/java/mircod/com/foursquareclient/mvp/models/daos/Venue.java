@@ -31,11 +31,16 @@ public class Venue {
     private String categories;
     private int distance;
     private int likes;
+    private double lat;
+    private double lng;
+
+
     private String bestPhotoUri;
     
-    @Generated(hash = 1898405317)
+    @Generated(hash = 18947531)
     public Venue(Long id, String venueId, @NotNull String name, String address,
-            String categories, int distance, int likes, String bestPhotoUri) {
+            String categories, int distance, int likes, double lat, double lng,
+            String bestPhotoUri) {
         this.id = id;
         this.venueId = venueId;
         this.name = name;
@@ -43,6 +48,8 @@ public class Venue {
         this.categories = categories;
         this.distance = distance;
         this.likes = likes;
+        this.lat = lat;
+        this.lng = lng;
         this.bestPhotoUri = bestPhotoUri;
     }
 
@@ -96,6 +103,23 @@ public class Venue {
     public Long getId() {
         return id;
     }
+
+    public double getLat() {
+        return lat;
+    }
+
+    public void setLat(double lat) {
+        this.lat = lat;
+    }
+
+    public double getLng() {
+        return lng;
+    }
+
+    public void setLng(double lng) {
+        this.lng = lng;
+    }
+
 
 
 

@@ -8,4 +8,79 @@
     tools:context="mircod.com.foursquareclient.components.ui.activities.VenueDetailsActivity"
     tools:showIn="@layout/activity_venue_details">
 
+
+    <TextView
+        android:id="@+id/textVenueNameDetails"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="8dp"
+        android:text="TextView"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginRight="8dp"
+        app:layout_constraintHorizontal_bias="0.079"
+        app:layout_constraintTop_toBottomOf="@+id/listPhoto" />
+
+    <TextView
+        android:id="@+id/textCategoriesDetails"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="3dp"
+        android:text="TextView"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textVenueNameDetails"
+        android:layout_marginRight="8dp"
+        app:layout_constraintHorizontal_bias="0.08" />
+
+    <TextView
+        android:id="@+id/textAddressDetails"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginTop="1dp"
+        app:layout_constraintTop_toBottomOf="@+id/textCategoriesDetails"
+        android:layout_marginRight="8dp"
+        app:layout_constraintHorizontal_bias="0.08" />
+
+    <TextView
+        android:id="@+id/textDistance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        android:layout_marginLeft="8dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginTop="3dp"
+        app:layout_constraintTop_toBottomOf="@+id/textAddressDetails"
+        android:layout_marginRight="8dp"
+        app:layout_constraintHorizontal_bias="0.08" />
+
+    <TextView
+        android:id="@+id/textRating"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="3dp"
+        android:text="TextView"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textDistance"
+        android:layout_marginRight="8dp"
+        app:layout_constraintHorizontal_bias="0.08" />
+
+
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/listPhoto"
+        android:layout_width="315dp"
+        android:layout_height="67dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="16dp"
+        app:layout_constraintHorizontal_bias="0.177"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="8dp" />
+
 </android.support.constraint.ConstraintLayout>

@@ -92,13 +92,18 @@ public class MainRepository {
                                 for (int i = 0; i < venues.length(); i++) {
                                     JSONObject venue = venues.getJSONObject(i);
                                     String name = venue.getString("name");
-                                    String address = " ";
+                                    String address = "hidden";
+                                    double lat = 0;
+                                    double lng = 0;
                                     int distance = 0;
                                     if (venue.has("location")) {
                                         JSONObject location = venue.getJSONObject("location");
                                         if (location.has("address") && location.has("address")) {
                                             address = location.getString("address");
                                             distance = location.getInt("distance");
+                                            lat = location.getDouble("lat");
+                                            lng = location.getDouble("lng");
+
                                         }
                                     }
                                     JSONArray categories = venue.getJSONArray("categories");
@@ -118,7 +123,8 @@ public class MainRepository {
                                     v.setAddress(address);
                                     v.setDistance(distance);
                                     v.setCategories(cats);
-
+                                    v.setLat(lat);
+                                    v.setLng(lng);
                                     addVenueToList(v);
 
 
@@ -196,7 +202,6 @@ public class MainRepository {
                         JSONObject photos = venue.getJSONObject("photos");
 
                         JSONArray groups = photos.getJSONArray("groups");
-                        Log.d("groupssssss", groups.toString());
                         List<String> urls = new ArrayList<>();
                         for (int i = 0; i < groups.length(); i++) {
                             JSONArray items = groups.getJSONObject(i).getJSONArray("items");
@@ -267,7 +272,7 @@ public class MainRepository {
                     }
                 }
 
-                venueDao.insert(venue);
+                venueDao.insertOrReplace(venue);
 
             }
         }

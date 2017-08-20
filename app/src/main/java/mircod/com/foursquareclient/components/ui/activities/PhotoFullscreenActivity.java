@@ -1,6 +1,7 @@
 package mircod.com.foursquareclient.components.ui.activities;
 
 import android.annotation.SuppressLint;
+import android.media.Image;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -9,6 +10,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.MenuItem;
 import android.support.v4.app.NavUtils;
+import android.widget.ImageView;
+
+import com.squareup.picasso.Picasso;
 
 import mircod.com.foursquareclient.R;
 
@@ -36,7 +40,7 @@ public class PhotoFullscreenActivity extends AppCompatActivity {
      */
     private static final int UI_ANIMATION_DELAY = 300;
     private final Handler mHideHandler = new Handler();
-    private View mContentView;
+    private ImageView mContentView;
     private final Runnable mHidePart2Runnable = new Runnable() {
         @SuppressLint("InlinedApi")
         @Override
@@ -100,9 +104,10 @@ public class PhotoFullscreenActivity extends AppCompatActivity {
 
         mVisible = true;
         mControlsView = findViewById(R.id.fullscreen_content_controls);
-        mContentView = findViewById(R.id.fullscreen_photo);
+        mContentView =(ImageView) findViewById(R.id.fullscreen_photo);
 
-
+        String url = getIntent().getStringExtra("photo");
+        Picasso.with(this).load(url).into(mContentView);
         // Set up the user interaction to manually show or hide the system UI.
         mContentView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -114,7 +119,6 @@ public class PhotoFullscreenActivity extends AppCompatActivity {
         // Upon interacting with UI controls, delay any scheduled hide()
         // operations to prevent the jarring behavior of controls going away
         // while interacting with the UI.
-        findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener);
     }
 
     @Override
