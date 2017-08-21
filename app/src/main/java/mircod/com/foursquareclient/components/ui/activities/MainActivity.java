@@ -1,8 +1,10 @@
 package mircod.com.foursquareclient.components.ui.activities;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.preference.Preference;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -31,11 +33,15 @@ public class MainActivity extends BaseActivity implements
 
     private double mLat, mLong;
     public static final String VENUE_ID = "venueId";
+    public static final String LATITUDE_KEY = "latitude";
+    public static final String LONGITUDE_KEY = "longitude";
     private boolean allPermissionsGranted = false;
     private FusedLocationProviderClient mFusedLocationClient;
     private PermissionHandler mPermissionHandler;
     private LocationRequest mLocationRequest;
     private FloatingActionButton fab;
+    private SharedPreferences sharedPreferences;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,10 +56,15 @@ public class MainActivity extends BaseActivity implements
         });
         mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
+        sharedPreferences = getPreferences(MODE_PRIVATE);
+        mLat = Double.valueOf(sharedPreferences.getString(LATITUDE_KEY,"0"));
+        mLong = Double.valueOf(sharedPreferences.getString(LONGITUDE_KEY,"0"));
 
+        if (mLat==0 && mLong==0){
+            mLat = 55.7983556;
+            mLong = 49.1064488;
 
-        mLat = 55.7983556;
-        mLong = 49.1064488;
+        }
 
 
 
@@ -87,7 +98,7 @@ public class MainActivity extends BaseActivity implements
             Fragment fragment = getSupportFragmentManager().findFragmentByTag("main");
             if (fragment!=null && fragment.isVisible())
                 ((VenuesListFragment)fragment).clearCache();
-        }
+        }else if (item.getItemId()==R.id.itemRefresh) refreshFragment();
         return super.onOptionsItemSelected(item);
     }
 
@@ -130,6 +141,8 @@ public class MainActivity extends BaseActivity implements
                         if (location!=null){
                             mLat = location.getLatitude();
                             mLong = location.getLongitude();
+                            fab.setVisibility(View.GONE);
+                            saveToSharedPreference(mLat,mLong);
                         }else {
                             Log.d(MainActivity.class.getSimpleName()," last location exception : null");
                             requestLocation();
@@ -150,6 +163,10 @@ public class MainActivity extends BaseActivity implements
                 .setFastestInterval(1 * 1000);
     }
 
+    private void saveToSharedPreference(double lat, double lng){
+        sharedPreferences.edit().putString(LATITUDE_KEY,String.valueOf(lat)).apply();
+        sharedPreferences.edit().putString(LONGITUDE_KEY,String.valueOf(lng)).apply();
+    }
     private void loadFragment(){
         if (allPermissionsGranted){
             Fragment fragment = VenuesListFragment.newInstance(mLat,mLong);
@@ -159,5 +176,12 @@ public class MainActivity extends BaseActivity implements
             mPermissionHandler.shoudlHandleStorageAndLocationPermissions();
         }
 
+    }
+
+    private void refreshFragment(){
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag("main");
+        if (fragment!=null && fragment.isVisible()){
+            ((VenuesListFragment)fragment).onRefresh();
+        }
     }
 }

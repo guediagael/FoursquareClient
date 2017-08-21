@@ -139,18 +139,21 @@ public class VenuesListFragment extends Fragment implements BaseFragment,
         if (refreshLayout.isRefreshing()) refreshLayout.setRefreshing(false);
         mVenues.clear();
         mVenues.addAll(venues);
-        try {
-            new Handler().post(new Runnable() {
-                @Override
-                public void run() {
-                    rvVenues.setAdapter(new VenuesListAdapter(mVenues,VenuesListFragment.this));
-                }
-            });
-        }catch (Exception e){
+        if (venues.size()>0){
+            try {
+                new Handler().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        rvVenues.setAdapter(new VenuesListAdapter(mVenues,VenuesListFragment.this));
+                    }
+                });
+            }catch (Exception e){
 //            When the api is locked no need for a handler
-            rvVenues.setAdapter(new VenuesListAdapter(mVenues,VenuesListFragment.this));
-            Toast.makeText(getActivity(),"API blocked", Toast.LENGTH_LONG).show();
-        }
+                rvVenues.setAdapter(new VenuesListAdapter(mVenues,VenuesListFragment.this));
+            }
+        }else Toast.makeText(getActivity(),"API blocked or there is no venue around",
+                Toast.LENGTH_LONG).show();
+
 
     }
 

@@ -12,4 +12,5 @@
     <string name="msg_meters">meters from your location</string>
     <string name="msg_likes" translatable="false">likes </string>
     <string name="msg_distance">distance from your location</string>
+    <string name="item_refresh">Refresh</string>
 </resources>
