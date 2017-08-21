@@ -98,8 +98,6 @@ public class VenuesListFragment extends Fragment implements BaseFragment,
         rvVenues.setLayoutManager(new LinearLayoutManager(getActivity()));
         refreshLayout = (SwipeRefreshLayout)view;
         refreshLayout.setOnRefreshListener(this);
-//        mPresenter.getVenues(mLat+","+mLong);
-//        loadVenues();
 
     }
 
@@ -141,16 +139,34 @@ public class VenuesListFragment extends Fragment implements BaseFragment,
     }
 
     @Override
+    public void venueDeleted() {
+
+    }
+
+    @Override
+    public void venuesDeleted() {
+        new Handler().post(new Runnable() {
+            @Override
+            public void run() {
+                mVenues.clear();
+                rvVenues.getAdapter().notifyDataSetChanged();
+                Toast.makeText(getActivity(),"cache cleared", Toast.LENGTH_SHORT).show();
+
+            }
+        });
+    }
+
+    @Override
     public void onRefresh() {
 //
         mLoader.forceLoad();
     }
 
-    private void loadVenues(){
-        refreshLayout.setRefreshing(true);
-        if (isNetworkAvailable()) mPresenter.getVenues(mLat+","+mLong);
-        else mPresenter.getVenues(null);
-    }
+//    private void loadVenues(){
+//        refreshLayout.setRefreshing(true);
+//        if (isNetworkAvailable()) mPresenter.getVenues(mLat+","+mLong);
+//        else mPresenter.getVenues(null);
+//    }
 
     private boolean isNetworkAvailable(){
         ConnectivityManager connectivityManager  =
@@ -166,21 +182,22 @@ public class VenuesListFragment extends Fragment implements BaseFragment,
     }
 
     @Override
-    public void deleteVenue(String id) {
-
+    public void deleteVenue(String id, int position) {
+        rvVenues.getAdapter().notifyItemRemoved(position);
+        mPresenter.deleteVenue(id);
     }
 
 
 
     public void clearCache(){
-        Toast.makeText(getActivity(),"cache cleared", Toast.LENGTH_SHORT).show();
+        mPresenter.deleteVenues();
     }
 
 
     @Override
     public Loader<Void> onCreateLoader(int id, Bundle args) {
         String location;
-        if (mLat==0 && mLong== 0) location = null;
+        if ((mLat==0 && mLong== 0)|| !isNetworkAvailable()) location = null;
         else location = mLat+","+mLong;
         refreshLayout.setRefreshing(true);
         return new DetailsFetcher(getActivity(),location,mPresenter);

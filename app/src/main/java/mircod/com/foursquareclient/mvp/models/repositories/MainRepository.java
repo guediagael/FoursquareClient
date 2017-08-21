@@ -7,7 +7,7 @@ import android.support.v4.content.AsyncTaskLoader;
 import android.util.Log;
 
 
-
+import org.greenrobot.greendao.query.Query;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -140,7 +140,6 @@ public class MainRepository {
 
 
                             } else {
-//                        TODO: show error message
                                 Log.d(MainRepository.class.getSimpleName(), "response error: " +
                                         response.toString());
                             }
@@ -219,7 +218,6 @@ public class MainRepository {
                             }
                         }
 
-//                        updateVenueFromList(id, likesCount, urls, bestPhotoUrl);
                         new DataExtractor().execute(id,likesCount,urls,bestPhotoUrl);
 
                     }
@@ -283,7 +281,6 @@ public class MainRepository {
             String newUrl = StorageHandler.convertsrcUrlToLocalUri(url, id).toString();
             photo.setUri(newUrl);
             photoDao.insertOrReplace(photo);
-//            TODO: save to the sd card
         }
 
 
@@ -293,6 +290,31 @@ public class MainRepository {
         mListener.dataLoaded(venueDao.loadAll());
     }
 
+    public void deleteVenue(final String venueId){
+
+           new Thread(new Runnable() {
+               @Override
+               public void run() {
+                   StorageHandler.deletePicture(venueId);
+               }
+           });
+
+        venueDao.queryBuilder().where(VenueDao.Properties.VenueId.eq(venueId)).buildDelete();
+        photoDao.queryBuilder().where(PhotoDao.Properties.VenueId.eq(venueId)).buildDelete();
+        mListener.venueDeleted();
+    }
+
+    public void deleteVenues(){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                StorageHandler.deletePictures();
+            }
+        });
+        venueDao.deleteAll();
+        photoDao.deleteAll();
+        mListener.venuesDeleted();
+    }
 
     public void setListener(RepositoryListener listener) {
         mListener = listener;
@@ -301,7 +323,8 @@ public class MainRepository {
 
     public interface RepositoryListener {
         void dataLoaded(List<Venue> venues);
-
+        void venueDeleted();
+        void venuesDeleted();
         void error(int code);
     }
 

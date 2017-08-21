@@ -13,7 +13,7 @@ public interface VenueDetailsContract {
 
     interface VenueDetailsView extends BaseView {
 
-        void venueDeleted(boolean isDeleted);
+        void venueDeleted();
         void detailsLoaded(Venue venue, List<Photo> photos);
     }
 

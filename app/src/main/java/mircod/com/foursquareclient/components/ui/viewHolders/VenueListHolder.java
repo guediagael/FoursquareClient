@@ -43,7 +43,7 @@ public class VenueListHolder extends RecyclerView.ViewHolder {
 
     public void bindData(String name,String distance, final String id){
         tvName.setText(name);
-        tvDistance.setText(distance);
+        tvDistance.setText(distance );
 
         ibDeleteFromCache.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -54,9 +54,12 @@ public class VenueListHolder extends RecyclerView.ViewHolder {
     }
 
     public ImageView getIvThumbnail(){
-        pbThumbnail.setVisibility(View.GONE);
         ivThumbnail.setVisibility(View.VISIBLE);
         return ivThumbnail;
+    }
+
+    public void stopLoading(){
+        pbThumbnail.setVisibility(View.GONE);
     }
 
     public interface ClearButtonListener{

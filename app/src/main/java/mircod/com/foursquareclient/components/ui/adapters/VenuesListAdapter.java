@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -23,6 +24,7 @@ public class VenuesListAdapter extends RecyclerView.Adapter<VenueListHolder> imp
     private List<Venue> venues;
     private Context mContext;
     private VenueInteractionListener mListener;
+    private int positionToDelete;
 
     public VenuesListAdapter(List<Venue> venues,VenueInteractionListener listener) {
         this.venues = venues;
@@ -43,7 +45,7 @@ public class VenuesListAdapter extends RecyclerView.Adapter<VenueListHolder> imp
 
 
     @Override
-    public void onBindViewHolder(VenueListHolder holder, int position) {
+    public void onBindViewHolder(final VenueListHolder holder, int position) {
         Venue venue = venues.get(position);
         String name = venue.getName();
         Log.d(getClass().getSimpleName(),venue.getName());
@@ -53,7 +55,17 @@ public class VenuesListAdapter extends RecyclerView.Adapter<VenueListHolder> imp
 //        long id = venue.getId();
         holder.bindData(name,distance,venueId);
         String imageUrl = venue.getBestPhotoUri();
-        Picasso.with(mContext).load(imageUrl).into(holder.getIvThumbnail());
+        Picasso.with(mContext).load(imageUrl).into(holder.getIvThumbnail(), new Callback() {
+            @Override
+            public void onSuccess() {
+                holder.stopLoading();
+            }
+
+            @Override
+            public void onError() {
+                holder.stopLoading();
+            }
+        });
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -69,13 +81,20 @@ public class VenuesListAdapter extends RecyclerView.Adapter<VenueListHolder> imp
 
     @Override
     public void clearButtonPressed(String id) {
-        mListener.deleteVenue(id);
+        for (Venue venue : venues){
+            if (venue.getVenueId().equals(id)){
+                positionToDelete = venues.indexOf(venue);
+                venues.remove(positionToDelete);
+                break;
+            }
+        }
+        mListener.deleteVenue(id,positionToDelete);
     }
 
 
     public interface VenueInteractionListener {
         void venueSelected(String venueId);
-        void deleteVenue(String id);
+        void deleteVenue(String id, int position);
 
     }
 }

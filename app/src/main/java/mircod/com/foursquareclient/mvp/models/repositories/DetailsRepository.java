@@ -9,6 +9,7 @@ import mircod.com.foursquareclient.mvp.models.daos.Photo;
 import mircod.com.foursquareclient.mvp.models.daos.PhotoDao;
 import mircod.com.foursquareclient.mvp.models.daos.Venue;
 import mircod.com.foursquareclient.mvp.models.daos.VenueDao;
+import mircod.com.foursquareclient.uitls.StorageHandler;
 
 /**
  * Created by guedi on 8/18/2017.
@@ -35,6 +36,19 @@ public class DetailsRepository {
         mListener = listener;
     }
 
+    public void deleteVenue(final String venueId){
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                StorageHandler.deletePicture(venueId);
+            }
+        });
+
+        venueDao.queryBuilder().where(VenueDao.Properties.VenueId.eq(venueId)).buildDelete();
+        photoDao.queryBuilder().where(PhotoDao.Properties.VenueId.eq(venueId)).buildDelete();
+        mListener.venueDeleted();
+    }
     public interface RepositoryListener{
         void detailsLoaded(Venue venue, List<Photo> photos);
         void venueDeleted();

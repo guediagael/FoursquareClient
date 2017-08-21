@@ -12,7 +12,8 @@ import mircod.com.foursquareclient.mvp.models.repositories.MainRepository;
  * Created by guedi on 8/17/2017.
  */
 
-public class VenuesPresenter implements VenuesListContract.VenuesListPresenter, MainRepository.RepositoryListener {
+public class VenuesPresenter implements VenuesListContract.VenuesListPresenter,
+        MainRepository.RepositoryListener {
     private MainRepository mMainrepository;
     private VenuesListContract.VenuesListView mView;
 
@@ -30,18 +31,28 @@ public class VenuesPresenter implements VenuesListContract.VenuesListPresenter, 
 
     @Override
     public void deleteVenues() {
-
+        mMainrepository.deleteVenues();
     }
 
     @Override
     public void deleteVenue(String id) {
-
+        mMainrepository.deleteVenue(id);
     }
 
 
     @Override
     public void dataLoaded(List<Venue> venues) {
         mView.venuesLoaded(venues);
+    }
+
+    @Override
+    public void venueDeleted() {
+        mView.venueDeleted();
+    }
+
+    @Override
+    public void venuesDeleted() {
+        mView.venuesDeleted();
     }
 
     @Override

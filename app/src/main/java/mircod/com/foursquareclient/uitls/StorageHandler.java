@@ -74,6 +74,17 @@ public class StorageHandler {
     }
 
 
+    public static void deletePicture(String venueId){
+        File file = new File(venueId);
+        file.delete();
+    }
+
+    public static void deletePictures(){
+        String uri = APP_FOLDER.getPath();
+        File appFolder = new File(uri);
+        appFolder.delete();
+    }
+
 
 
 

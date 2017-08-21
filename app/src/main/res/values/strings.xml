@@ -1,10 +1,15 @@
 <resources>
     <string name="app_name">FoursquareClient</string>
     <string name="item_clear_cache">Clear cache</string>
-    <string name="title_activity_venue_details">VenueDetailsActivity</string>
-    <string name="title_activity_maps">M</string>
+    <string name="title_activity_venue_details" translatable="false">VenueDetailsActivity</string>
+    <string name="title_activity_maps">MAP</string>
 
-    <string name="title_activity_photo_fullscreen">PhotoFullscreenActivity</string>
-    <string name="dummy_button">Dummy Button</string>
-    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="title_activity_photo_fullscreen" translatable="false">PhotoFullscreenActivity</string>
+
+
+    <string name="msg_location_not_available">Location not available</string>
+    <string name="msg_hidden_addrress">Address hidden</string>
+    <string name="msg_meters">meters from your location</string>
+    <string name="msg_likes" translatable="false">likes </string>
+    <string name="msg_distance">distance from your location</string>
 </resources>

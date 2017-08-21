@@ -14,6 +14,8 @@ public interface VenuesListContract {
 
     interface VenuesListView extends BaseView{
         void venuesLoaded(List<Venue> venues);
+        void venueDeleted();
+        void venuesDeleted();
     }
 
     interface VenuesListPresenter{

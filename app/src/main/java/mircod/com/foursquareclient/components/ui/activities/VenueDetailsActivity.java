@@ -3,11 +3,9 @@ package mircod.com.foursquareclient.components.ui.activities;
 
 import android.content.Intent;
 
-import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -34,12 +32,11 @@ public class VenueDetailsActivity extends BaseActivity implements View.OnClickLi
 
     private ImageView ivPictures;
     private String mVenueId;
-    private int position=0;
     private List<String> photoUrls;
     private VenueDetailsContract.VenuePresenter mPresenter;
     private String urlToLoad, address;
     private double lat, lng;
-    private String name;
+    private String venueName, venueId;
     private RecyclerView rvPhoto;
     private TextView tvAddress, tvDistance, tvRating, tvCategory, tvName;
 
@@ -74,9 +71,6 @@ public class VenueDetailsActivity extends BaseActivity implements View.OnClickLi
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-//        getSupportLoaderManager().initLoader(0,null,this);
-
-
         DaoSession daoSession = ((App)getApplication()).getDaoSession();
         mPresenter = new VenueDetailsPresenter(this,new DetailsRepository(daoSession));
         mPresenter.getDetails(mVenueId);
@@ -96,7 +90,7 @@ public class VenueDetailsActivity extends BaseActivity implements View.OnClickLi
                     Intent intent = new Intent(this, MapsActivity.class);
                     intent.putExtra("lat", lat);
                     intent.putExtra("lng", lng);
-                    intent.putExtra("name", name);
+                    intent.putExtra("venueName", venueName);
                     startActivity(intent);
                 }else
                     Snackbar.make(view, "the venue you selected hide hir location", Snackbar.LENGTH_LONG).show();
@@ -104,46 +98,17 @@ public class VenueDetailsActivity extends BaseActivity implements View.OnClickLi
                 break;
             case R.id.fabDeleteFromCacheDetails :
                 Snackbar.make(view, "deleting from cache", Snackbar.LENGTH_LONG).show();
+                mPresenter.deleteVenue(venueId);
                 break;
             case R.id.imagePhotosDetails:
                 Intent intent2 = new Intent(this, PhotoFullscreenActivity.class);
                 intent2.putExtra("photo",urlToLoad);
-//                ActivityOptionsCompat optionsCompat = ActivityOptionsCompat
-//                        .makeSceneTransitionAnimation(this, ivPictures,"photos");
-//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-//                    startActivity(intent, optionsCompat.toBundle());
-//                }else {
-                    startActivity(intent2);
-
-//                }
+                startActivity(intent2);
                 break;
         }
     }
 
 
-
-
-    private void switchToNextPhoto(){
-        position++;
-        if (photoUrls.size()>0 && position<photoUrls.size()-1) {
-            urlToLoad = photoUrls.get(position);
-//            getSupportLoaderManager().initLoader(0,null,this).forceLoad();
-//            ivPictures.setImageURI(Uri.parse(urlToLoad));
-            Picasso.with(this).load(urlToLoad).into(ivPictures);
-
-        }
-    }
-
-    private void switchToPreviousPhoto(){
-        position--;
-        if (photoUrls.size()>0 && position>=1){
-            urlToLoad = photoUrls.get(position);
-//            getSupportLoaderManager().initLoader(0,null,this).forceLoad();
-//            ivPictures.setImageURI(Uri.parse(urlToLoad));
-            Picasso.with(this).load(urlToLoad).into(ivPictures);
-
-        }
-    }
 
 
     @Override
@@ -152,8 +117,8 @@ public class VenueDetailsActivity extends BaseActivity implements View.OnClickLi
     }
 
     @Override
-    public void venueDeleted(boolean isDeleted) {
-
+    public void venueDeleted() {
+        onBackPressed();
     }
 
     @Override
@@ -165,31 +130,17 @@ public class VenueDetailsActivity extends BaseActivity implements View.OnClickLi
             }
             lat = venue.getLat();
             lng = venue.getLng();
-//            ivPictures
-//                    .setFactory(new ViewSwitcher.ViewFactory() {
-//                @Override
-//                public View makeView() {
-//                    ImageView imageView = new ImageView(getApplicationContext());
-//                    imageView.setScaleType(ImageView.ScaleType.FIT_XY);
-//                    imageView.setLayoutParams(
-//                            new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
-//                                    FrameLayout.LayoutParams.MATCH_PARENT));
-//                    return imageView;
-//                }
-//            });
             urlToLoad = photoUrls.get(0);
-
-//            getSupportLoaderManager().initLoader(0,null,this).forceLoad();
-//            ivPictures.setImageURI(Uri.parse(urlToLoad));
             Picasso.with(this).load(urlToLoad).into(ivPictures);
 
             tvName.setText(venue.getName());
-            tvRating.setText(venue.getLikes() + "");
-            tvDistance.setText(venue.getDistance() + "");
+            tvRating.setText(venue.getLikes() + " " + getString(R.string.msg_likes));
+            tvDistance.setText(venue.getDistance() + " " +getString(R.string.msg_meters));
             tvCategory.setText(venue.getCategories());
             tvAddress.setText(venue.getAddress());
             address = venue.getAddress();
-            name = venue.getName();
+            venueName = venue.getName();
+            venueId = venue.getVenueId();
             LinearLayoutManager layoutManager = new LinearLayoutManager(this);
             layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
             rvPhoto.setLayoutManager(layoutManager);
@@ -203,23 +154,10 @@ public class VenueDetailsActivity extends BaseActivity implements View.OnClickLi
 
     @Override
     public void imageSelected(String url) {
+        urlToLoad = url;
         Picasso.with(this).load(url).into(ivPictures);
     }
 
-//    @Override
-//    public Loader<Drawable> onCreateLoader(int id, Bundle args) {
-//        return new BitmapLoader(this,urlToLoad);
-//    }
-//
-//    @Override
-//    public void onLoadFinished(Loader<Drawable> loader, Drawable data) {
-//        ivPictures.setImageDrawable(data);
-//    }
-//
-//    @Override
-//    public void onLoaderReset(Loader<Drawable> loader) {
-//
-//    }
 
 
 }

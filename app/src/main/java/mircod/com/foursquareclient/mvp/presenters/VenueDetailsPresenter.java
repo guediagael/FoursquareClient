@@ -31,7 +31,7 @@ public class VenueDetailsPresenter implements VenueDetailsContract.VenuePresente
 
     @Override
     public void deleteVenue(String venueId) {
-
+        mRepository.deleteVenue(venueId);
     }
 
     @Override
@@ -41,7 +41,7 @@ public class VenueDetailsPresenter implements VenueDetailsContract.VenuePresente
 
     @Override
     public void venueDeleted() {
-
+        mView.venueDeleted();
     }
 
     @Override

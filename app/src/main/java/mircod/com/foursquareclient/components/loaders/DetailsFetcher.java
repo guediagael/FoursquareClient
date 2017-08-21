@@ -17,7 +17,8 @@ public   class DetailsFetcher extends AsyncTaskLoader<Void> {
 
 
 
-    public DetailsFetcher(Context context, @Nullable String ltLong, VenuesListContract.VenuesListPresenter presenter) {
+    public DetailsFetcher(Context context, @Nullable String ltLong,
+                          VenuesListContract.VenuesListPresenter presenter) {
         super(context);
         networkState = ltLong != null;
         if (networkState) location = ltLong;
