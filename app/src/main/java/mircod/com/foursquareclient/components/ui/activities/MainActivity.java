@@ -52,10 +52,8 @@ public class MainActivity extends BaseActivity implements
 
 
 
-//        innopolis
-        mLat = 55.75316381092981;
-        mLong = 48.74170753597821;
-//
+        mLat = 0;
+        mLong = 0;
 
 
 
@@ -135,28 +133,13 @@ public class MainActivity extends BaseActivity implements
                         }else {
                             Log.d(MainActivity.class.getSimpleName()," last location exception : null");
                             requestLocation();
-                            showErrorMessage("location not available",
+                            showErrorMessage(getString(R.string.msg_location_not_available),
                                     findViewById(R.id.coordinatorMain));
                             fab.setVisibility(View.VISIBLE);
                         }
                     }
                 });
-//                .addOnCompleteListener(this, new OnCompleteListener<Location>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<Location> task) {
-//                        if (task.isSuccessful() && task.getResult() !=null){
-//                            mLat = task.getResult().getLatitude();
-//                            mLong = task.getResult().getLongitude();
-//                        }else {
-//                            Log.d(MainActivity.class.getSimpleName()," last location exception :"+
-//                                    task.getException());
-//                            requestLocation();
-//                            showErrorMessage("location not available",
-//                                    findViewById(R.id.coordinatorMain));
-//                            fab.setVisibility(View.VISIBLE);
-//                        }
-//                    }
-//                });
+
 
     }
 
