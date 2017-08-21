@@ -5,6 +5,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -65,6 +66,7 @@ public class VenuesListFragment extends Fragment implements BaseFragment,
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRetainInstance(true);
         if (getArguments() != null) {
             mLat = getArguments().getDouble(ARG_LAT);
             mLong = getArguments().getDouble(ARG_LONG);
@@ -75,6 +77,12 @@ public class VenuesListFragment extends Fragment implements BaseFragment,
 
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Parcelable layoutManagerConfig = rvVenues.getLayoutManager().onSaveInstanceState();
+        outState.putParcelable("layoutManager",layoutManagerConfig);
+    }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
