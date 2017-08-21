@@ -14,6 +14,7 @@ import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -70,6 +71,7 @@ public class VenuesListFragment extends Fragment implements BaseFragment,
         if (getArguments() != null) {
             mLat = getArguments().getDouble(ARG_LAT);
             mLong = getArguments().getDouble(ARG_LONG);
+            Log.d( "latlong:",mLat + ":" + mLong);
         }
         DaoSession daoSession = ((App)getActivity().getApplication()).getDaoSession();
         mPresenter = new VenuesPresenter(new MainRepository(daoSession),this);
@@ -137,12 +139,17 @@ public class VenuesListFragment extends Fragment implements BaseFragment,
         if (refreshLayout.isRefreshing()) refreshLayout.setRefreshing(false);
         mVenues.clear();
         mVenues.addAll(venues);
-        new Handler().post(new Runnable() {
-            @Override
-            public void run() {
-                rvVenues.setAdapter(new VenuesListAdapter(mVenues,VenuesListFragment.this));
-            }
-        });
+        try {
+            new Handler().post(new Runnable() {
+                @Override
+                public void run() {
+                    rvVenues.setAdapter(new VenuesListAdapter(mVenues,VenuesListFragment.this));
+                }
+            });
+        }catch (Exception e){
+//            When the api is locked no need for a handler
+            rvVenues.setAdapter(new VenuesListAdapter(mVenues,VenuesListFragment.this));
+        }
 
     }
 

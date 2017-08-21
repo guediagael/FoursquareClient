@@ -73,6 +73,7 @@ public class MainRepository {
             call.enqueue(new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    Log.d("response full", response.raw().toString());
                     if (response.body() != null) {
                         venueDao.deleteAll();
                         photoDao.deleteAll();

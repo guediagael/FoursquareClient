@@ -52,8 +52,8 @@ public class MainActivity extends BaseActivity implements
 
 
 
-        mLat = 0;
-        mLong = 0;
+        mLat = 55.7983556;
+        mLong = 49.1064488;
 
 
 
