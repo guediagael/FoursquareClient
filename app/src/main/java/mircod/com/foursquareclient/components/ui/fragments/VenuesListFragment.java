@@ -149,7 +149,7 @@ public class VenuesListFragment extends Fragment implements BaseFragment,
         }catch (Exception e){
 //            When the api is locked no need for a handler
             rvVenues.setAdapter(new VenuesListAdapter(mVenues,VenuesListFragment.this));
-            Toast.makeText(getActivity(),"API blaocked", Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(),"API blocked", Toast.LENGTH_LONG).show();
         }
 
     }
